@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block page_title %}
+    Detail
+{% endblock page_title %}
+
+{% block content %}
+<div>
+    <h1>{{post.name}}</h1>
+    <h3>{{post.description}}</h3>
+</div>
+<div>
+    <h2>By: {{post.writer.username}}</h2>
+</div>
+{% endblock content %}

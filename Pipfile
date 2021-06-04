@@ -5,8 +5,17 @@ name = "pypi"
 
 [packages]
 django = "*"
+django-countries = "*"
+django-dotenv = "*"
+requests = "*"
+pillow = "*"
 
 [dev-packages]
+flake8 = "*"
+black = "*"
 
 [requires]
 python_version = "3.9"
+
+[pipenv]
+allow_prereleases = true
