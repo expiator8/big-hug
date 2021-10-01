@@ -10,7 +10,7 @@
     </div>
 
     {% for field in form %}
-    {% include 'mixins/auth/form_input.html' with field=field%}
+    {% include 'mixins/post/post_input.html' with field=field%}
     {% endfor %}
 
     <button class="btn login-btn text-white">{{cta}}</button>

@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block page_title %}
+    {{user_obj.first_name}}'s Profile
+{% endblock page_title %}
+
+{% block content %}
+    <div class="min-h-75vh w-full">
+        <div class="contaner lg:w-5/12 md:w-1/2 xl:w-1/4 mx-auto my-10 flex flex-col items-center border p-6 border-gray-300">
+            
+            {% include "mixins/user_avatar.html" with user=user_obj %}
+            
+            <div class="flex items-center">
+                <span class="text-3xl mt-1">{{user_obj.first_name}}</span>
+                {% if user_obj.is_superuser %}
+                    <i class="fas fa-check-circle text-green-400 ml-1"></i>
+                {% endif %}
+                {% if user.is_authenticated and user_obj.pk != user.pk %}
+                        <a href="{% url 'conversations:go' user_obj.pk user.pk %}">쪽지</a>
+                {% endif %}
+            </div>
+
+            <span class="text-lg mb-5">{{user.bio}}</span>
+
+            {% if user == user_obj %}
+                <a href="{% url 'users:update' %}" class="btn login-btn text-white">Edit Profile</a>
+            {% endif %}
+
+        </div>
+        {% if user_obj.posts.count > 0 %}
+            <div class="container mx-auto pb-10 flex flex-col items-center">
+                <h3 class="mb-12 text-2xl text-center">{{user_obj.first_name}}'s Posts</h3>
+                <div class="flex flex-col items-center">
+                    <div class="flex flex-col border bg-post border-border rounded-sm w-post text-center">
+                        {% for post in user_obj.posts.all  %}
+                            {% include 'mixins/post_box.html' with post=post %}
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+{% endblock content %}

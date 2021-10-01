@@ -22,7 +22,6 @@ class PostAdmin(admin.ModelAdmin):
         "name",
         "writer",
         "post_type",
-        "country",
     )
 
     ordering = (
@@ -31,10 +30,7 @@ class PostAdmin(admin.ModelAdmin):
         "post_type",
     )
 
-    list_filter = (
-        "post_type",
-        "country",
-    )
+    list_filter = ("post_type",)
 
     raw_id_fields = ("writer",)
 

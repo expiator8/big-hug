@@ -3,30 +3,98 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.3/css/fontawesome.css">
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.3/css/all.css">
     <link rel="stylesheet" href="{% static 'css/styles.css' %}">
     <title>{% block page_title %}{% endblock page_title %}| Deu Bighug</title>
+    <style>
+        /* start of desktop styles */
+        .pc {
+            display: contents;
+        }
+
+        .phone {
+            display: none;
+        }
+
+        .tablet {
+            display: none;
+        }
+
+        @media screen and (max-width: 991px) {
+
+            /* start of large tablet styles */
+            .pc {
+                display: none;
+            }
+
+            .phone {
+                display: none;
+            }
+
+            .tablet {
+                display: contents;
+            }
+        }
+
+        @media screen and (max-width: 767px) {
+
+            /* start of medium tablet styles */
+            .pc {
+                display: none;
+            }
+
+            .phone {
+                display: contents;
+            }
+
+            .tablet {
+                display: none;
+            }
+        }
+
+        @media screen and (max-width: 479px) {
+
+            /* start of phone styles */
+            .pc {
+                display: none;
+            }
+        }
+    </style>
 </head>
 
-<body class="text-gray-800 mt-24 font-light">
-    <header class="container max-w-full inset-0 flex items-center justify-between px-6 h-20 border-b border-gray-400 fixed bg-white">
-        <div class="flex items-center w-1/3">
-        <a class="mr-6" href="{% url 'core:home' %}">
-            <img class="w-16" src="{% static 'img/bighug_logo.png' %}" />
-        </a>
-        {% block search-bar %}
-            <form method="get" action="{% url 'posts:search' %}">
-                <input name="title" placeholder="Search By Title" />
-            </form>
-        {% endblock search-bar %}
-        </div>
-        {% include "partials/nav.html" %}
-    </header>
-    {% block content %} {% endblock content %}
+<body class="text-gray-700 mt-24 font-light bg-main_bg">
+    <div class="pc">
+        {% include "partials/messages.html" %}
+        <header
+            class="z-10 container max-w-full inset-0 flex items-center justify-between px-6 h-20 border-b border-border fixed bg-post">
+            <div class="flex items-center w-1/3">
+                <a class="mr-6" href="{% url 'core:home' %}">
+                    <img class="w-16" src="{% static 'img/bighug_logo.png' %}" />
+                </a>
+                {% block search-bar %}
+                <form method="get" action="{% url 'posts:search' %}" class="w-9/12">
+                    <div class="search-box border px-5 w-full py-3 rounded-sm shadow-md hover:shadow-lg">
+                        <i class="fas fa-search"></i>
+                        <input name="title" placeholder="Search By Title" />
+                    </div>
+                </form>
+                {% endblock search-bar %}
+            </div>
+            {% include "partials/nav.html" %}
+        </header>
+        <article class="flex flex-col items-center">
+            {% block content %} {% endblock content %}
+        </article>
+    </div>
+    <div class="phone">폰화면입니다</div>
+    <div class="tablet">태블릿화면입니다</div>
+    {% include "js.html" %}
 
+    {% block jquery %}{% endblock jquery %}
+
+    {% include "partials/messages.html" %}
     {% include "partials/footer.html" %}
 </body>
 

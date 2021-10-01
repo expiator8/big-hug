@@ -1,6 +1,6 @@
 from django.db import models
-from django_countries.fields import CountryField
 from core import models as core_models
+from django.shortcuts import reverse
 
 
 class AbstractItem(core_models.TimeStampedModel):
@@ -30,13 +30,15 @@ class Post(core_models.TimeStampedModel):
 
     name = models.CharField(max_length=140)
     writer = models.ForeignKey(
-        "users.User", related_name="rooms", on_delete=models.CASCADE
+        "users.User", related_name="posts", on_delete=models.CASCADE
     )
     post_type = models.ForeignKey(
         "PostType", related_name="posts", on_delete=models.SET_NULL, null=True
     )
     description = models.TextField(default="")
-    country = CountryField()
 
     def __str__(self):
         return self.name
+
+    def get_absolute_url(self):
+        return reverse("posts:detail", kwargs={"pk": self.pk})

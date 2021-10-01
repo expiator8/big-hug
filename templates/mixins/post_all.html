@@ -1,0 +1,36 @@
+<div class="flex flex-col border bg-post border-border rounded-sm w-post text-center">
+    <div class="font-medium">최신글</div>
+    <div class="flex border-t-2	border-b-2 border-border">
+        <div class="w-post_type">구분</div>
+        <div class="w-post_title">제목</div>
+        <div class="w-post_writer">작성자</div>
+        <div class="w-post_update">작성일</div>
+        <div class="w-post_count">조회수</div>
+        <div class="w-post_like">찜하기</div>
+    </div>
+    
+    {% for post in posts %}
+        {% include "mixins/post_box.html" with post=post %}
+    {% endfor %}
+</div>
+
+<div class="paginate_link mt-3 w-post flex justify-start bg-main_bg">
+    {% if page_obj.has_previous %}
+        <a class="page_outline_link" href="?page=1">First</a>
+        <a class="page_outline_link" href="?page={{page_obj.previous_page_number}}">Previous</a>
+    {% endif %}
+
+    {% for num in page_obj.paginator.page_range %}
+        {% if page_obj.number == num %}
+            <a class="page_link" href="?page={{num}}">{{num}}</a>
+        {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+            <a class="page_outline_link" href="?page={{num}}">{{num}}</a>
+        {% endif %}
+    {% endfor %}
+
+    {% if page_obj.has_next %}
+        <a class="page_outline_link" href="?page={{page_obj.next_page_number}}">Next</a>
+        <a class="page_outline_link" href="?page={{page_obj.paginator.num_pages}}">Last</a>
+    {% endif %}
+
+</div>

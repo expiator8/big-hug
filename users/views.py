@@ -16,11 +16,10 @@ from . import forms, models, mixins
 from django.shortcuts import render
 
 
-class LoginView(FormView):
+class LoginView(mixins.LoggedOutOnlyView, FormView):
 
     template_name = "users/login.html"
     form_class = forms.LoginForm
-    success_url = reverse_lazy("core:home")
 
     def form_valid(self, form):
         email = form.cleaned_data.get("email")
@@ -28,15 +27,24 @@ class LoginView(FormView):
         user = authenticate(self.request, username=email, password=password)
         if user is not None:
             login(self.request, user)
+            messages.success(self.request, f"Welcome back {user.first_name}")
         return super().form_valid(form)
+
+    def get_success_url(self):
+        next_arg = self.request.GET.get("next")
+        if next_arg is not None:
+            return next_arg
+        else:
+            return reverse("core:home")
 
 
 def log_out(request):
+    messages.info(request, f"See you later {request.user.first_name}")
     logout(request)
     return redirect(reverse("core:home"))
 
 
-class SignUpView(FormView):
+class SignUpView(mixins.LoggedOutOnlyView, FormView):
 
     template_name = "users/signup.html"
     form_class = forms.SignUpForm
@@ -51,14 +59,6 @@ class SignUpView(FormView):
             login(self.request, user)
         user.verify_email()
         return super().form_valid(form)
-
-
-#     # def get_success_url(self):
-#     #     next_arg = self.request.GET.get("next")
-#     #     if next_arg is not None:
-#     #         return next_arg
-#     #     else:
-#     #         return reverse("core:home")
 
 
 def complete_verification(request, key):
@@ -179,7 +179,6 @@ def kakao_callback(request):
         profile_json = profile_request.json()
         kakao_account = profile_json.get("kakao_account")
         email = kakao_account.get("email")
-        print(email)
         if email is None:
             raise KakaoException("Please also give me your email")
         properties = profile_json.get("properties")
@@ -212,66 +211,65 @@ def kakao_callback(request):
         return redirect(reverse("users:login"))
 
 
-# class UserProfileView(DetailView):
+class UserProfileView(DetailView):
 
-#     model = models.User
-#     context_object_name = "user_obj"
-
-
-# class UpdateProfileView(mixins.LoggedInOnlyView, SuccessMessageMixin, UpdateView):
-
-#     model = models.User
-#     template_name = "users/update-profile.html"
-#     fields = (
-#         "first_name",
-#         "last_name",
-#         "gender",
-#         "birthdate",
-#     )
-#     success_message = "Profile Updated"
-
-#     def get_object(self, queryset=None):
-#         return self.request.user
-
-#     def get_form(self, form_class=None):
-#         form = super().get_form(form_class=form_class)
-#         form.fields["first_name"].widget.attrs = {"placeholder": "First name"}
-#         form.fields["last_name"].widget.attrs = {"placeholder": "Last name"}
-#         form.fields["birthdate"].widget.attrs = {"placeholder": "Birthdate"}
-#         form.fields["first_name"].widget.attrs = {"placeholder": "First name"}
-#         return form
+    model = models.User
+    context_object_name = "user_obj"
 
 
-# class UpdatePasswordView(
-#     mixins.LoggedInOnlyView,
-#     mixins.EmailLoginOnlyView,
-#     SuccessMessageMixin,
-#     PasswordChangeView,
-# ):
+class UpdateProfileView(mixins.LoggedInOnlyView, SuccessMessageMixin, UpdateView):
 
-#     template_name = "users/update-password.html"
-#     success_message = "Password Updated"
+    model = models.User
+    template_name = "users/update-profile.html"
+    fields = (
+        "first_name",
+        "last_name",
+        "gender",
+        "bio",
+        "birthdate",
+    )
+    success_message = "Profile Updated"
 
-#     def get_form(self, form_class=None):
-#         form = super().get_form(form_class=form_class)
-#         form.fields["old_password"].widget.attrs = {"placeholder": "Current password"}
-#         form.fields["new_password1"].widget.attrs = {"placeholder": "New password"}
-#         form.fields["new_password2"].widget.attrs = {
-#             "placeholder": "Confirm new password"
-#         }
-#         return form
+    def get_object(self, queryset=None):
+        return self.request.user
 
-#     def get_success_url(self):
-#         return self.request.user.get_absolute_url()
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class=form_class)
+        form.fields["first_name"].label = "이름"
+        form.fields["last_name"].label = "닉네임"
+        form.fields["gender"].label = "성별"
+        form.fields["bio"].label = "소개"
+        form.fields["birthdate"].label = "생년월일"
+        return form
 
 
-# @login_required
-# def switch_hosting(request):
-#     try:
-#         del request.session["is_hosting"]
-#     except KeyError:
-#         request.session["is_hosting"] = True
-#     return redirect(reverse("core:home"))
+class UpdatePasswordView(
+    mixins.LoggedInOnlyView,
+    mixins.EmailLoginOnlyView,
+    SuccessMessageMixin,
+    PasswordChangeView,
+):
+    template_name = "users/update-password.html"
+    success_message = "Password Updated"
+
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class=form_class)
+        form.fields["old_password"].label = "기존 비밀번호"
+        form.fields["new_password1"].label = "새 비밀번호"
+        form.fields["new_password2"].label = "새 비밀번호 확인"
+        return form
+
+    def get_success_url(self):
+        return self.request.user.get_absolute_url()
+
+
+@login_required
+def switch_hosting(request):
+    try:
+        del request.session["is_hosting"]
+    except KeyError:
+        request.session["is_hosting"] = True
+    return redirect(reverse("core:home"))
 
 
 # def switch_language(request):

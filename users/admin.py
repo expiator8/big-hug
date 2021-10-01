@@ -22,13 +22,14 @@ class CustomUserAdmin(UserAdmin):
         ),
     )
 
-    list_filter = UserAdmin.list_filter
+    list_filter = UserAdmin.list_filter + ("country",)
 
     list_display = (
         "username",
         "first_name",
         "last_name",
         "email",
+        "country",
         "is_active",
         "is_staff",
         "is_superuser",

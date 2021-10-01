@@ -1,0 +1,15 @@
+<div class="flex border-b border-border hover:bg-main_bg text-center text-sm">
+    <div class="w-post_type">{{post.post_type}}</div>
+    <div class="flex w-post_title text-left">
+        <i class="far fa-comment-dots mt-1 mr-1 text-gray-400"></i>
+        {% if post.name|length > 67 %}
+        <a href="{% url 'posts:detail' post.pk %}">{{post.name|slice:":59"}} ...({{post.reviews.count}})</a>
+        {% else %}
+        <a href="{% url 'posts:detail' post.pk %}">{{post.name}}({{post.reviews.count}})</a>
+        {% endif %}
+    </div>
+    <div class="w-post_writer">{{post.writer.first_name}}</div>
+    <div class="w-post_update text-11">{{post.created|date:"m.d"}}</div>
+    <div class="w-post_count">-</div>
+    <div class="w-post_like">-</div>
+</div>

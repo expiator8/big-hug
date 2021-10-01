@@ -1,15 +1,82 @@
 {% extends "base.html" %}
 
 {% block page_title %}
-    Detail
+    {{post.name}}
 {% endblock page_title %}
 
 {% block content %}
-<div>
-    <h1>{{post.name}}</h1>
-    <h3>{{post.description}}</h3>
-</div>
-<div>
-    <h2>By: {{post.writer.username}}</h2>
+
+<div class="container min-h-75vh w-full flex">
+    <div class="flex flex-col items-center">
+        <div class="p-3 flex flex-col md-20 border border-l-0 border-r-0 bg-post border-border rounded-sm w-post">
+            <div class="mt-3 px-5 flex justify-between">
+                <div class="mr-2 flex flex-col items-start">
+                    <div class="font-medium">
+                        <h4 class="text-3xl font-medium mb-px">{{post.name}}</h4>
+                        <span class="text-gray-700 font-light">{{post.post_type}} 게시판</span>
+                    </div>
+                </div>
+                <div class="flex items-center">
+                    <a href="{{post.writer.get_absolute_url}}" class="mr-3 flex flex-col items-center">
+                        {% include "mixins/user_avatar.html" with user=post.writer %}
+                        <span class="mt-1 text-gray-500">{{post.writer.first_name}}</span>
+                    </a>
+                </div>
+            </div>
+            <div class="border-section flex justify-between items-center px-5">
+                <div class="flex flex-col">
+                    <span class="text-sm text-light">등록 {{post.created|date:"Y.m.d H:i:s"}}</span>
+                    <span class="text-sm text-light">마지막 수정 {{post.updated|date:"Y.m.d H:i:s"}}</span>
+                </div>
+                <div>
+                    <span>조회 0</span>
+                    <span>추천 0</span>
+                    <span>댓글 -</span>
+                </div>
+            </div>
+            <div class="break-all">
+                <span>{{post.description}}</span>
+            </div>
+            <div class="mt-4">
+                <h4 class="font-medium text-2xl mb-5">Reviews</h4>
+                <div>
+                    {{post.reviews.count}} review{{post.reviews.count|pluralize}}
+                </div>
+            </div>
+            <div class="mt-5">
+                {% for review in post.reviews.all %}
+                    <div class="border-section">
+                        <div class="mb-3 flex">
+                            <div>
+                                {% include "mixins/user_avatar.html" with user=review.user h_and_w='w-10 h-10' text='text-xl' %}
+                            </div>
+                            <div class="flex flex-col ml-5">
+                                <span class="font-medium">{{review.user.first_name}}</span>
+                                <span class="text-sm text-gray-500">{{review.updated|date:"M d일 H:i, Y"}}</span>
+                            </div>
+                        </div>
+                        <p>{{review.review}}</p>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+     <div class="ml-5 w-64">
+        {% if post.writer == user %}
+            <a href="{% url 'posts:edit' post.pk %}" class="btn bg-p_edit font-medium text-white block">수정하기</a>
+        {% endif %}
+        {% if user.is_authenticated %}
+            <form action="{% url 'reviews:create' post.pk %}" method="POST" class="w-full" enctype="multipart/form-data">
+                {% csrf_token %}
+
+                <div class="input w-full">
+                    {{form}}
+                </div>
+
+                <button class="btn bg-p_edit font-medium text-white block">댓글 등록</button>
+            </form>
+
+        {% endif %}
+    </div>
 </div>
 {% endblock content %}
